@@ -1,0 +1,114 @@
+---
+- name: Configurar y desplegar el portafolio en Ubuntu 24.04
+  hosts: all
+  become: true
+  vars:
+    portfolio_dir: /opt/carolina-portfolio
+    site_address: "{{ lookup('ansible.builtin.env', 'SITE_ADDRESS') | default(':80', true) }}"
+    dockerhub_username: "{{ lookup('ansible.builtin.env', 'DOCKERHUB_USERNAME') }}"
+    image_tag: "{{ lookup('ansible.builtin.env', 'IMAGE_TAG') | default('latest', true) }}"
+  pre_tasks:
+    - name: Esperar la conexión SSH de la VM
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+    - name: Confirmar que la VM usa Ubuntu 24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['distribution'] == 'Ubuntu'
+          - ansible_facts['distribution_version'] is version('24.04', '>=')
+        fail_msg: La VM debe ejecutar Ubuntu 24.04.
+    - name: Actualizar la caché de APT
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+    - name: Instalar herramientas de sistema y firewall
+      ansible.builtin.apt:
+        name: [ca-certificates, curl, git, ufw, iptables]
+        state: present
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+  tasks:
+    - name: Crear directorio para la clave de Docker
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+    - name: Instalar clave oficial de Docker
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+    - name: Configurar repositorio oficial de Docker
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/docker.sources
+        mode: '0644'
+        content: |
+          Types: deb
+          URIs: https://download.docker.com/linux/ubuntu
+          Suites: noble
+          Components: stable
+          Architectures: amd64
+          Signed-By: /etc/apt/keyrings/docker.asc
+    - name: Instalar Docker Engine y Compose
+      ansible.builtin.apt:
+        name: [docker-ce, docker-ce-cli, containerd.io, docker-buildx-plugin, docker-compose-plugin]
+        state: present
+        update_cache: true
+    - name: Habilitar el servicio Docker
+      ansible.builtin.service:
+        name: docker
+        enabled: true
+        state: started
+    - name: Permitir SSH antes de activar UFW
+      community.general.ufw:
+        rule: allow
+        port: '22'
+        proto: tcp
+    - name: Permitir HTTP y HTTPS en UFW
+      community.general.ufw:
+        rule: allow
+        port: '{{ item }}'
+        proto: tcp
+      loop: ['80', '443']
+    - name: Activar UFW
+      community.general.ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+    - name: Confirmar reglas persistentes de iptables creadas por UFW
+      ansible.builtin.command: iptables -C ufw-user-input -p tcp --dport {{ item }} -j ACCEPT
+      loop: ['80', '443']
+      changed_when: false
+    - name: Crear directorio de despliegue
+      ansible.builtin.file:
+        path: '{{ portfolio_dir }}'
+        state: directory
+        mode: '0755'
+    - name: Copiar Docker Compose
+      ansible.builtin.copy:
+        src: ../compose.yaml
+        dest: '{{ portfolio_dir }}/compose.yaml'
+        mode: '0644'
+    - name: Copiar configuración de Caddy
+      ansible.builtin.copy:
+        src: ../Caddyfile
+        dest: '{{ portfolio_dir }}/Caddyfile'
+        mode: '0644'
+    - name: Guardar parámetros de despliegue
+      ansible.builtin.copy:
+        dest: '{{ portfolio_dir }}/.env'
+        mode: '0600'
+        content: |
+          DOCKERHUB_USERNAME={{ dockerhub_username }}
+          IMAGE_TAG={{ image_tag }}
+          SITE_ADDRESS={{ site_address }}
+    - name: Descargar imágenes Docker
+      ansible.builtin.command: docker compose pull
+      args:
+        chdir: '{{ portfolio_dir }}'
+      changed_when: true
+    - name: Arrancar portafolio y proxy
+      ansible.builtin.command: docker compose up -d --no-build --remove-orphans
+      args:
+        chdir: '{{ portfolio_dir }}'
+      changed_when: true
