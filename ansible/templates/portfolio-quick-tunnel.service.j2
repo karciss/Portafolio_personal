@@ -1,0 +1,14 @@
+[Unit]
+Description=Cloudflare Quick Tunnel para el portafolio personal
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/portfolio-quick-tunnel
+Restart=always
+RestartSec=5s
+TimeoutStopSec=15s
+
+[Install]
+WantedBy=multi-user.target

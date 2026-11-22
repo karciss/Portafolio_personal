@@ -59,6 +59,22 @@
         name: docker
         enabled: true
         state: started
+    - name: Instalar clave oficial de paquetes de Cloudflare
+      ansible.builtin.get_url:
+        url: https://pkg.cloudflare.com/cloudflare-main.gpg
+        dest: /usr/share/keyrings/cloudflare-main.gpg
+        mode: '0644'
+    - name: Configurar repositorio oficial de Cloudflare
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/cloudflared.list
+        mode: '0644'
+        content: |
+          deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main
+    - name: Instalar cloudflared
+      ansible.builtin.apt:
+        name: cloudflared
+        state: present
+        update_cache: true
     - name: Permitir SSH antes de activar UFW
       community.general.ufw:
         rule: allow
@@ -112,3 +128,20 @@
       args:
         chdir: '{{ portfolio_dir }}'
       changed_when: true
+
+    - name: Instalar lanzador del Quick Tunnel gratuito
+      ansible.builtin.copy:
+        src: files/portfolio-quick-tunnel.sh
+        dest: /usr/local/sbin/portfolio-quick-tunnel
+        mode: '0755'
+    - name: Instalar servicio systemd del Quick Tunnel
+      ansible.builtin.template:
+        src: templates/portfolio-quick-tunnel.service.j2
+        dest: /etc/systemd/system/portfolio-quick-tunnel.service
+        mode: '0644'
+    - name: Mantener Quick Tunnel activo cuando no hay dominio
+      ansible.builtin.systemd_service:
+        name: portfolio-quick-tunnel.service
+        daemon_reload: true
+        enabled: "{{ site_address == ':80' }}"
+        state: "{{ 'started' if site_address == ':80' else 'stopped' }}"

@@ -17,6 +17,18 @@ jobs:
     steps:
       - name: Descargar código
         uses: actions/checkout@v5
+      - name: Preparar Python para validar infraestructura
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Instalar herramientas de Ansible
+        run: |
+          python -m pip install ansible-core
+          ansible-galaxy collection install -r ansible/requirements.yml
+      - name: Validar Ansible y el script del túnel
+        run: |
+          bash -n ansible/files/portfolio-quick-tunnel.sh
+          ansible-playbook --syntax-check ansible/playbook.yml
       - name: Preparar Node.js
         uses: actions/setup-node@v5
         with:

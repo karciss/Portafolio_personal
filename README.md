@@ -85,9 +85,11 @@ El enlace histórico de GitHub Pages muestra una portada estática con acceso vo
 
 La imagen está publicada en [Docker Hub como `karitoziss/carolina-portfolio`](https://hub.docker.com/r/karitoziss/carolina-portfolio). El flujo publica las etiquetas `latest` y `<SHA del commit>`, aplica Terraform y usa Ansible para descargar esa imagen exacta. Configura los secretos antes de enviar el primer commit a `main`; si falta alguno, el flujo falla con un mensaje claro.
 
-### Dominio en Cloudflare (opcional)
+### Cloudflare y URL gratuita
 
-Para el punto extra, usa un **dominio que ya controles** en Cloudflare y añade `CLOUDFLARE_API_TOKEN` como secret, además de `CLOUDFLARE_ZONE_ID` y `SITE_DOMAIN` como variables. El token necesita permiso **DNS:Edit** solo sobre esa zona. El flujo crea o actualiza el registro A hacia la IP de la VM. Caddy solicita el certificado TLS automáticamente y atiende por HTTPS. Si no configuras dominio, el sitio funciona por HTTP en la IP pública. El script no compra ni registra un dominio nuevo.
+Si no tienes dominio, el despliegue instala `cloudflared` desde el repositorio oficial de Cloudflare y crea un Quick Tunnel gratuito hacia el proxy Caddy de la VM. La URL aleatoria `https://<nombre>.trycloudflare.com` aparece en el resumen de la ejecución **Publicación del portafolio** en GitHub Actions. El túnel se mantiene como servicio de systemd y se inicia junto a la VM; reiniciar la laptop no lo detiene. Si la VM o el proceso del túnel se reinician, la URL puede cambiar. Cloudflare destina Quick Tunnels a pruebas y desarrollo, por lo que la IP pública sigue disponible como alternativa.
+
+Para una dirección estable, usa un dominio propio añadido a Cloudflare. Configura `CLOUDFLARE_API_TOKEN` como secret y `CLOUDFLARE_ZONE_ID` y `SITE_DOMAIN` como variables. El token requiere permiso **DNS:Edit** solo sobre esa zona. El flujo crea o actualiza el registro A hacia la IP de la VM y Caddy solicita el certificado TLS automáticamente. El proyecto no compra ni registra dominios.
 
 ## Estructura
 
