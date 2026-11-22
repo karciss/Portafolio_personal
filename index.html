@@ -9,9 +9,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      .page-fallback{min-height:100vh;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,1fr);align-items:center;gap:6vw;padding:8vw;background:#f8f5ff;color:#322544;font-family:Outfit,sans-serif}
+      .page-fallback small{color:#8d64ce;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+      .page-fallback h1{font-size:clamp(3rem,6vw,5.5rem);line-height:1.02;letter-spacing:-.055em;margin:22px 0}
+      .page-fallback h1 em{font-style:normal;color:#9c79db}
+      .page-fallback p{max-width:520px;color:#786d87;font:1.1rem/1.7 'DM Sans',sans-serif}
+      .page-fallback a{display:inline-block;margin-top:24px;background:#322544;color:#fff;padding:16px 24px;border-radius:13px;text-decoration:none;font-weight:700}
+      .page-fallback img{width:100%;border-radius:30px;box-shadow:0 30px 70px #7161922b}
+      @media(max-width:720px){.page-fallback{grid-template-columns:1fr;padding:12vw 6vw}.page-fallback h1{font-size:3.4rem}}
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app"><main class="page-fallback"><div><small>Carolina Cisneros Arroyo · Portafolio</small><h1>Ideas que toman <em>forma</em> en código.</h1><p>La experiencia interactiva y sus proyectos están publicados en mi servidor de Oracle Cloud. Abre el portafolio completo para conocerlos.</p><a href="http://155.181.191.7/" target="_blank" rel="noopener noreferrer">Abrir portafolio completo ↗</a></div><img src="./src/assets/hero-atelier.png" alt="Ilustración creativa de un portátil y hojas verdes" /></main></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
