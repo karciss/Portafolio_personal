@@ -11,8 +11,13 @@ export const seedProjects = [
   },
   {
     slug: 'calculadora-cinematica', title: 'Cinemática visual', category: 'Desarrollo',
-    kind: 'Cálculo y visualización', stack: 'C# · Windows Forms · Python',
-    description: 'Herramientas para resolver y graficar problemas de cinemática.', accent: 'peach', glyph: '◒'
+    kind: 'Aplicación de escritorio', stack: 'C# · Windows Forms',
+    description: 'Calculadora de física para resolver problemas de cinemática con resultados detallados.', accent: 'peach', glyph: '◒'
+  },
+  {
+    slug: 'graficas-cinematica', title: 'Cinemática en gráficas', category: 'Desarrollo',
+    kind: 'Visualización de datos', stack: 'Python',
+    description: 'Módulo complementario que presenta visualizaciones gráficas de problemas físicos.', accent: 'lavender', glyph: '⌁'
   },
   {
     slug: 'diseno-logos', title: 'Identidad y edición', category: 'Diseño',
@@ -23,6 +28,11 @@ export const seedProjects = [
     slug: 'escenario-feria', title: 'Feria en 3D', category: 'Diseño',
     kind: 'Modelado y animación', stack: 'Blender',
     description: 'Escenario de feria con assets, personajes y elementos animados.', accent: 'mint', glyph: '✿'
+  },
+  {
+    slug: 'animacion-gumball', title: 'Animación de personajes', category: 'Diseño',
+    kind: 'Ilustración y animación', stack: 'Adobe Illustrator',
+    description: 'Animación temática inspirada en El Mundo de Gumball, con personajes y escenarios.', accent: 'lavender', glyph: '✧'
   },
   {
     slug: 'animacion-wall-e', title: 'Animación 3D', category: 'Diseño',

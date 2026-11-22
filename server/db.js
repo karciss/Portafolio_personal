@@ -16,12 +16,13 @@ export async function createStore(filePath = ':memory:') {
     id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL,
     message TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );`);
-  const count = db.exec('SELECT COUNT(*) AS total FROM projects')[0].values[0][0];
-  if (count === 0) {
-    for (const project of seedProjects) {
-      db.run('INSERT INTO projects (slug,title,category,kind,stack,description,accent,glyph) VALUES (?,?,?,?,?,?,?,?)',
-        [project.slug, project.title, project.category, project.kind, project.stack, project.description, project.accent, project.glyph]);
-    }
+  for (const project of seedProjects) {
+    db.run(`INSERT INTO projects (slug,title,category,kind,stack,description,accent,glyph)
+      VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(slug) DO UPDATE SET
+      title=excluded.title, category=excluded.category, kind=excluded.kind,
+      stack=excluded.stack, description=excluded.description,
+      accent=excluded.accent, glyph=excluded.glyph`,
+      [project.slug, project.title, project.category, project.kind, project.stack, project.description, project.accent, project.glyph]);
   }
   const save = () => {
     if (filePath === ':memory:') return;
@@ -30,7 +31,7 @@ export async function createStore(filePath = ':memory:') {
     fs.writeFileSync(temporary, Buffer.from(db.export()));
     fs.renameSync(temporary, filePath);
   };
-  if (!persisted) save();
+  save();
   return {
     listProjects() {
       const result = db.exec('SELECT slug,title,category,kind,stack,description,accent,glyph FROM projects ORDER BY id');

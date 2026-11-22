@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Descargar código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Comprobar credenciales de Docker Hub
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -66,7 +66,7 @@ jobs:
       SITE_ADDRESS: ${{ vars.SITE_DOMAIN != '' && vars.SITE_DOMAIN || ':80' }}
     steps:
       - name: Descargar código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Comprobar parámetros OCI
         env:
           OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
@@ -106,7 +106,7 @@ jobs:
         id: vm
         run: echo "ip=$(terraform -chdir=infra output -raw public_ip)" >> "$GITHUB_OUTPUT"
       - name: Preparar Python para Ansible
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Instalar Ansible y colección UFW
