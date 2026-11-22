@@ -34,7 +34,7 @@ export async function createStore(filePath = ':memory:') {
   save();
   return {
     listProjects() {
-      const result = db.exec('SELECT slug,title,category,kind,stack,description,accent,glyph FROM projects ORDER BY id');
+      const result = db.exec('SELECT slug,title,category,kind,stack,description,accent,glyph FROM projects ORDER BY CASE slug WHEN 'unisocial' THEN 0 WHEN 'juego-dental-vr-ar' THEN 1 WHEN 'analisis-hojas' THEN 2 WHEN 'fondos-blender-gamedev' THEN 3 ELSE 4 END, id');
       return result.length ? result[0].values.map((row) => Object.fromEntries(result[0].columns.map((column, index) => [column, row[index]]))) : [];
     },
     saveMessage({ name, email, message }) {

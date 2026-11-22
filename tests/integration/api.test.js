@@ -32,7 +32,7 @@ test('API de proyectos lee datos iniciales desde SQLite', async () => {
   const response = await fetch(`${base}/api/projects`);
   const projects = await response.json();
   assert.equal(response.status, 200);
-  assert.equal(projects.length, 8);
+  assert.equal(projects.length, 12);
   assert.ok(projects.some((project) => project.slug === 'veterinaria-multimodular'));
 });
 
