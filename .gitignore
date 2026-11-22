@@ -12,3 +12,4 @@ playwright-report/
 !infra/terraform.example.tfvars
 .env
 *.pem
+.secrets/

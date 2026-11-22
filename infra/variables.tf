@@ -30,7 +30,7 @@ variable "ssh_allowed_cidr" {
 variable "instance_shape" {
   description = "Shape OCI para la VM Ubuntu."
   type        = string
-  default     = "VM.Standard.E3.Flex"
+  default     = "VM.Standard.E5.Flex"
 }
 
 variable "ocpus" {
@@ -42,7 +42,13 @@ variable "ocpus" {
 variable "memory_gb" {
   description = "Memoria RAM de la VM en GB."
   type        = number
-  default     = 8
+  default     = 4
+}
+
+variable "baseline_ocpu_utilization" {
+  description = "Línea base de CPU para instancias E4 burstable; BASELINE_1_8 equivale a 12,5 %."
+  type        = string
+  default     = "BASELINE_1_8"
 }
 
 variable "image_ocid" {

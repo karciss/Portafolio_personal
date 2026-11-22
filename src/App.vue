@@ -1,6 +1,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { categories, filterProjects } from './portfolio.js';
+import ProjectPreview from './ProjectPreview.vue';
+import heroImage from './assets/hero-atelier.png';
 
 const projects = ref([]);
 const category = ref('Todos');
@@ -9,6 +11,12 @@ const selectedProject = ref(null);
 const loading = ref(true);
 const loadError = ref(false);
 const menuOpen = ref(false);
+const activeFocus = ref(0);
+const focusAreas = [
+  { number: '01', title: 'Desarrollo', description: 'Construyo experiencias web y aplicaciones que unen una interfaz clara con datos y lógica bien organizados.', tools: 'Vue · React · Node.js · C# · SQL' },
+  { number: '02', title: 'Diseño', description: 'Exploro identidad visual, composición y movimiento para que cada solución tenga personalidad propia.', tools: 'Illustrator · Photoshop · Blender' },
+  { number: '03', title: 'Exploración', description: 'Investigo redes, seguridad y nuevas tecnologías para llevar cada idea un poco más lejos.', tools: 'Redes · Ciberseguridad · IA' },
+];
 const form = ref({ name: '', email: '', message: '', website: '' });
 const formState = ref('idle');
 const formMessage = ref('');
@@ -83,16 +91,16 @@ onMounted(() => {
           </div>
           <div class="hero-micro"><span>01 / DESARROLLO</span><span>02 / DISEÑO</span><span>03 / SEGURIDAD</span></div>
         </div>
-        <div class="hero-art" aria-label="Ilustración abstracta con iniciales de Carolina">
-          <div class="art-grid"></div>
-          <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
-          <div class="art-card"><span class="art-top">CREAR · EXPLORAR · APRENDER</span><span class="art-initials">CC<span>✳</span></span><span class="art-bottom">Diseño & tecnología<br />en movimiento</span></div>
-          <div class="art-chip chip-code">&lt;idea /&gt;</div>
-          <div class="art-chip chip-spark">✦</div>
-          <div class="art-caption">Una mirada curiosa.<br />Muchas formas de crear.</div>
+        <div class="hero-art">
+          <img class="hero-image" :src="heroImage" alt="Composición tridimensional de un portátil violeta y una flor verde" />
+          <div class="hero-floating hero-floating-top"><span>✳</span><div><small>EN CONSTANTE MOVIMIENTO</small><strong>Diseñar + desarrollar</strong></div></div>
+          <div class="hero-floating hero-floating-bottom"><span class="floating-icon">↗</span><div><strong>8 proyectos</strong><small>ideas hechas realidad</small></div></div>
+          <span class="hero-vertical">CREATIVIDAD EN CÓDIGO · 2026</span>
         </div>
         <a class="scroll-cue" href="#sobre-mi">DESLIZA PARA CONOCERME <span aria-hidden="true">↓</span></a>
       </section>
+
+      <div class="marquee-band" aria-label="Intereses y especialidades"><div class="marquee-track" aria-hidden="true"><span>DESARROLLO WEB</span><i>✳</i><span>DISEÑO VISUAL</span><i>✳</i><span>EXPERIENCIAS DIGITALES</span><i>✳</i><span>TECNOLOGÍA CON INTENCIÓN</span><i>✳</i><span>DESARROLLO WEB</span><i>✳</i><span>DISEÑO VISUAL</span><i>✳</i><span>EXPERIENCIAS DIGITALES</span><i>✳</i><span>TECNOLOGÍA CON INTENCIÓN</span><i>✳</i></div></div>
 
       <section id="sobre-mi" class="about-section section-wrap">
         <div class="section-heading"><span class="section-kicker">UN POCO SOBRE MÍ</span><h2>Tecnología con una <em>mirada creativa.</em></h2></div>
@@ -101,6 +109,7 @@ onMounted(() => {
           <div class="about-copy"><p>Mi camino combina programación, bases de datos, redes y diseño gráfico. Me interesan especialmente la ciberseguridad y las soluciones digitales que se sienten claras, útiles y agradables de usar.</p><p>Trabajo con herramientas de desarrollo web y móvil, y también exploro la identidad visual, la animación y el modelado 3D.</p><a class="inline-link" href="mailto:cisneroscarolina869@gmail.com">Escríbeme por correo <span aria-hidden="true">↗</span></a></div>
         </div>
         <div class="skill-strip" aria-label="Áreas de trabajo"><span>Desarrollo full stack</span><span>Diseño gráfico</span><span>Modelado 3D</span><span>Ciberseguridad</span></div>
+        <div class="focus-panel"><div class="focus-intro"><span class="section-kicker">LO QUE ME MUEVE</span><h3>Una mente curiosa, <em>varias disciplinas.</em></h3><p>Elijo la herramienta adecuada para cada idea y aprendo algo nuevo en cada proceso.</p></div><div class="focus-content"><div class="focus-tabs" role="tablist" aria-label="Áreas de interés"><button v-for="(area, index) in focusAreas" :key="area.number" type="button" role="tab" :aria-selected="activeFocus === index" :class="{ active: activeFocus === index }" @click="activeFocus = index"><span>{{ area.number }}</span>{{ area.title }}<span aria-hidden="true">↗</span></button></div><div class="focus-detail" role="tabpanel"><span>ENFOQUE {{ focusAreas[activeFocus].number }}</span><h4>{{ focusAreas[activeFocus].title }}</h4><p>{{ focusAreas[activeFocus].description }}</p><small>{{ focusAreas[activeFocus].tools }}</small></div></div></div>
       </section>
 
       <section id="proyectos" class="projects-section section-wrap">
@@ -112,7 +121,7 @@ onMounted(() => {
         <div v-else class="project-grid">
           <article v-for="(project, index) in filteredProjects" :key="project.slug" class="project-card" :class="`accent-${project.accent}`">
             <button class="project-open" type="button" :aria-label="`Ver detalles de ${project.title}`" @click="selectedProject = project">
-              <div class="project-visual"><span class="visual-index">{{ String(index + 1).padStart(2, '0') }}</span><div class="visual-shape"><span>{{ project.glyph }}</span></div><span class="visual-corner" aria-hidden="true">↗</span></div>
+              <div class="project-visual"><ProjectPreview :project="project" /><span class="visual-index">{{ String(index + 1).padStart(2, '0') }}</span><span class="visual-corner" aria-hidden="true">↗</span></div>
               <div class="project-info"><div class="project-meta"><span>{{ project.category }}</span><span>{{ project.kind }}</span></div><h3>{{ project.title }}</h3><p>{{ project.description }}</p><span class="project-more">Ver detalles <span aria-hidden="true">↗</span></span></div>
             </button>
           </article>
@@ -125,6 +134,6 @@ onMounted(() => {
     </main>
     <footer class="site-footer section-wrap"><div><a class="brand" href="#inicio"><span class="brand-mark">C<span>✳</span></span><span>Carolina Cisneros</span></a><p>Diseño, código y nuevas ideas.</p></div><div class="footer-links"><a href="https://github.com/karciss" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="mailto:cisneroscarolina869@gmail.com">Correo ↗</a><a href="#inicio">Volver arriba ↑</a></div><small>© {{ new Date().getFullYear() }} Carolina Cisneros Arroyo</small></footer>
 
-    <div v-if="selectedProject" class="modal-backdrop" @click.self="selectedProject = null"><div class="project-modal" role="dialog" aria-modal="true" :aria-label="selectedProject.title"><button class="modal-close" type="button" aria-label="Cerrar detalles" @click="selectedProject = null">×</button><div class="modal-glyph" :class="`accent-${selectedProject.accent}`">{{ selectedProject.glyph }}</div><span class="section-kicker">{{ selectedProject.category }} · {{ selectedProject.kind }}</span><h2>{{ selectedProject.title }}</h2><p>{{ selectedProject.description }}</p><div class="modal-stack"><strong>Herramientas</strong><span>{{ selectedProject.stack }}</span></div><a class="inline-link" href="#contacto" @click="selectedProject = null">Conversar sobre un proyecto <span aria-hidden="true">↗</span></a></div></div>
+    <div v-if="selectedProject" class="modal-backdrop" @click.self="selectedProject = null"><div class="project-modal" role="dialog" aria-modal="true" :aria-label="selectedProject.title"><button class="modal-close" type="button" aria-label="Cerrar detalles" @click="selectedProject = null">×</button><div class="modal-preview"><ProjectPreview :project="selectedProject" /></div><span class="section-kicker">{{ selectedProject.category }} · {{ selectedProject.kind }}</span><h2>{{ selectedProject.title }}</h2><p>{{ selectedProject.description }}</p><div class="modal-stack"><strong>Herramientas</strong><span>{{ selectedProject.stack }}</span></div><a class="inline-link" href="#contacto" @click="selectedProject = null">Conversar sobre un proyecto <span aria-hidden="true">↗</span></a></div></div>
   </div>
 </template>

@@ -48,9 +48,9 @@ El sitio queda en `http://localhost`. Si el puerto 80 está ocupado, define `HTT
 
 ## Infraestructura OCI
 
-`infra/` usa Terraform >= 1.12 y el proveedor oficial de Oracle para crear una **VCN**, gateway de Internet, tabla de rutas, subred pública, lista de seguridad y VM Ubuntu **24.04** con IP pública. Se conserva el patrón de los ejemplos locales de OCI. La imagen se selecciona por sistema operativo y shape; para fijar una versión exacta, define `image_ocid`. La VM usa por defecto `VM.Standard.E3.Flex`, 1 OCPU y 8 GB; revisa cuota y posibles cargos en tu cuenta antes de aplicar.
+`infra/` usa Terraform >= 1.12 y el proveedor oficial de Oracle para crear una **VCN**, gateway de Internet, tabla de rutas, subred pública, lista de seguridad y VM Ubuntu **24.04** con IP pública. Se conserva el patrón de los ejemplos locales de OCI. La imagen se selecciona por sistema operativo y shape; para fijar una versión exacta, define `image_ocid`. A1.Flex y E2.1.Micro (Always Free), y luego E4.Flex, no tenían capacidad en Santiago al hacer el despliegue, por lo que la VM usa `VM.Standard.E5.Flex` con 1 OCPU burstable al 12,5 % y 4 GB. Esto genera cargos mientras permanece encendida. Según la tarifa pública de Oracle, la combinación de CPU y memoria equivale aproximadamente a USD 0,0154/h o USD 11,24 por 730 horas, sin incluir otros posibles cargos o impuestos. Ajusta `instance_shape`, `ocpus`, `memory_gb` y `baseline_ocpu_utilization` si cambias de plan. Docker Hub recibe imágenes para AMD64 y ARM64.
 
-El estado de Terraform se guarda en un bucket de OCI Object Storage mediante el backend nativo, que admite bloqueo. **Crea previamente** el bucket y habilita versionado. El usuario de OCI usado por Actions necesita permisos de gestión de red, Compute y objetos del bucket. No guardes claves ni archivos `.tfvars` reales en Git.
+El estado de Terraform se guarda en el bucket privado `portafolio-carolina-tfstate` de OCI Object Storage mediante el backend nativo, que admite bloqueo. El bucket ya tiene versionado habilitado. El usuario de OCI usado por Actions necesita permisos de gestión de red, Compute y objetos del bucket. No guardes claves ni archivos `.tfvars` reales en Git.
 
 Para comprobar la sintaxis sin acceder a la nube:
 
@@ -81,7 +81,7 @@ En **Settings → Secrets and variables → Actions**, configura:
 | Variable | `OCI_STATE_BUCKET` | Nombre del bucket de estado, creado previamente |
 | Variable | `OCI_NAMESPACE` | Namespace de Object Storage |
 
-La imagen ya está publicada en [Docker Hub como `karitoziss/carolina-portfolio`](https://hub.docker.com/r/karitoziss/carolina-portfolio). El flujo publica las etiquetas `latest` y `<SHA del commit>`, aplica Terraform y usa Ansible para descargar esa imagen exacta. Configura los secretos antes de enviar el primer commit a `main`; si falta alguno, el flujo falla con un mensaje claro.
+La imagen está publicada en [Docker Hub como `karitoziss/carolina-portfolio`](https://hub.docker.com/r/karitoziss/carolina-portfolio). El flujo publica las etiquetas `latest` y `<SHA del commit>`, aplica Terraform y usa Ansible para descargar esa imagen exacta. Configura los secretos antes de enviar el primer commit a `main`; si falta alguno, el flujo falla con un mensaje claro.
 
 ### Dominio en Cloudflare (opcional)
 

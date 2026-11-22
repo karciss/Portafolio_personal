@@ -1,6 +1,6 @@
 ---
 - name: Configurar y desplegar el portafolio en Ubuntu 24.04
-  hosts: portfolio
+  hosts: all
   become: true
   vars:
     portfolio_dir: /opt/carolina-portfolio
@@ -14,8 +14,8 @@
     - name: Confirmar que la VM usa Ubuntu 24.04
       ansible.builtin.assert:
         that:
-          - ansible_distribution == 'Ubuntu'
-          - ansible_distribution_version is version('24.04', '>=')
+          - ansible_facts['distribution'] == 'Ubuntu'
+          - ansible_facts['distribution_version'] is version('24.04', '>=')
         fail_msg: La VM debe ejecutar Ubuntu 24.04.
     - name: Actualizar la caché de APT
       ansible.builtin.apt:
@@ -23,7 +23,7 @@
         cache_valid_time: 3600
     - name: Instalar herramientas de sistema y firewall
       ansible.builtin.apt:
-        name: [ca-certificates, curl, git, ufw, iptables-persistent]
+        name: [ca-certificates, curl, git, ufw, iptables]
         state: present
       environment:
         DEBIAN_FRONTEND: noninteractive
@@ -75,15 +75,9 @@
         state: enabled
         policy: deny
         direction: incoming
-    - name: Asegurar reglas iptables para HTTP y HTTPS
-      ansible.builtin.shell: |
-        iptables -C INPUT -p tcp --dport {{ item }} -j ACCEPT 2>/dev/null || iptables -I INPUT -p tcp --dport {{ item }} -j ACCEPT
-      args:
-        executable: /bin/bash
+    - name: Confirmar reglas persistentes de iptables creadas por UFW
+      ansible.builtin.command: iptables -C ufw-user-input -p tcp --dport {{ item }} -j ACCEPT
       loop: ['80', '443']
-      changed_when: false
-    - name: Persistir reglas iptables
-      ansible.builtin.command: netfilter-persistent save
       changed_when: false
     - name: Crear directorio de despliegue
       ansible.builtin.file:

@@ -4,7 +4,7 @@ data "oci_identity_availability_domains" "available" {
 
 data "oci_core_images" "ubuntu" {
   compartment_id           = var.compartment_ocid
-  operating_system         = "Ubuntu"
+  operating_system         = "Canonical Ubuntu"
   operating_system_version = "24.04"
   shape                    = var.instance_shape
   sort_by                  = "TIMECREATED"
@@ -96,9 +96,13 @@ resource "oci_core_instance" "portfolio" {
   display_name        = "ubuntu-2404-portafolio-carolina"
   shape               = var.instance_shape
 
-  shape_config {
-    ocpus         = var.ocpus
-    memory_in_gbs = var.memory_gb
+  dynamic "shape_config" {
+    for_each = endswith(var.instance_shape, ".Flex") ? [1] : []
+    content {
+      ocpus                     = var.ocpus
+      memory_in_gbs             = var.memory_gb
+      baseline_ocpu_utilization = var.instance_shape == "VM.Standard.A1.Flex" ? null : var.baseline_ocpu_utilization
+    }
   }
 
   source_details {
