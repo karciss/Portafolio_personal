@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+data
+test-results
+playwright-report
+infra
+ansible
+legacy
+README.md
+*.tfstate*
+*.tfvars

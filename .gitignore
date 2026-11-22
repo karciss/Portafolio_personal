@@ -1,0 +1,14 @@
+node_modules/
+legacy/
+__pycache__/
+dist/
+data/
+test-results/
+playwright-report/
+.terraform/
+*.tfstate*
+*.tfplan
+*.tfvars
+!infra/terraform.example.tfvars
+.env
+*.pem

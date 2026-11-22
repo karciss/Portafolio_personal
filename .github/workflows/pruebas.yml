@@ -1,0 +1,43 @@
+name: Pruebas automatizadas
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev, main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: Pruebas unitarias, integración y E2E
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Ejecutar pruebas unitarias
+        run: npm run test:unit
+      - name: Ejecutar pruebas de integración
+        run: npm run test:integration
+      - name: Compilar frontend
+        run: npm run build
+      - name: Instalar navegador de Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Ejecutar pruebas E2E
+        run: npm run test:e2e
+      - name: Guardar evidencia E2E si falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencia-playwright
+          path: test-results/
+          if-no-files-found: ignore
