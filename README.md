@@ -81,6 +81,8 @@ En **Settings → Secrets and variables → Actions**, configura:
 | Variable | `OCI_STATE_BUCKET` | Nombre del bucket de estado, creado previamente |
 | Variable | `OCI_NAMESPACE` | Namespace de Object Storage |
 
+El enlace histórico de GitHub Pages muestra una portada estática con acceso voluntario a la aplicación en OCI. El archivo `.nojekyll` evita que Pages interprete los archivos de Ansible como plantillas Jekyll. Si cambia la IP pública de la VM, actualiza también el enlace de `index.html`.
+
 La imagen está publicada en [Docker Hub como `karitoziss/carolina-portfolio`](https://hub.docker.com/r/karitoziss/carolina-portfolio). El flujo publica las etiquetas `latest` y `<SHA del commit>`, aplica Terraform y usa Ansible para descargar esa imagen exacta. Configura los secretos antes de enviar el primer commit a `main`; si falta alguno, el flujo falla con un mensaje claro.
 
 ### Dominio en Cloudflare (opcional)
