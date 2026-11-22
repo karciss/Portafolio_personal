@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('muestra la presentación y los proyectos desde la API', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Ideas que toman');
-  await expect(page.getByRole('button', { name: 'Ver detalles de Veterinaria multimodular' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Ver detalles de UniSocial' })).toBeVisible();
 });
 
 test('filtra proyectos y abre sus detalles', async ({ page }) => {
