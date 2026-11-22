@@ -126,7 +126,7 @@ jobs:
         env:
           ANSIBLE_SSH_COMMON_ARGS: '-o StrictHostKeyChecking=accept-new'
         run: |
-          ansible-playbook -i '${{ steps.vm.outputs.ip }},' \
+          ansible-playbook -u ubuntu -i '${{ steps.vm.outputs.ip }},' \
             --private-key "$RUNNER_TEMP/vm_ssh_key" ansible/playbook.yml
       - name: Comprobar sitio publicado
         env:
